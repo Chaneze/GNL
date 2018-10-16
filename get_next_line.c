@@ -6,15 +6,15 @@
 /*   By: caroua <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/01 10:32:49 by caroua            #+#    #+#             */
-/*   Updated: 2018/10/13 20:02:58 by caroua           ###   ########.fr       */
+/*   Updated: 2018/10/16 09:47:05 by caroua           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static t_list			*get_correct_file(t_list **file, int fd)
+t_list				*get_correct_file(t_list **file, int fd)
 {
-	t_list				*tmp;
+	t_list	*tmp;
 
 	tmp = *file;
 	while (tmp)
@@ -23,17 +23,22 @@ static t_list			*get_correct_file(t_list **file, int fd)
 			return (tmp);
 		tmp = tmp->next;
 	}
-	tmp = ft_lstnew("\0", fd);
+	if (!(tmp = (t_list*)ft_memalloc(sizeof(t_list))))
+		return (NULL);
+	if ((tmp->content = (void *)malloc(1 * sizeof(size_t))) == NULL)
+		return (NULL);
+	tmp->content = "\0";
+	tmp->content_size = fd;
+	tmp->next = NULL;
 	ft_lstadd(file, tmp);
-	tmp = *file;
-	return (tmp);
+	return (*file);
 }
 
-char					*ft_strjoinch(char const *s1, char c)
+char				*ft_strjoinch(char const *s1, char c)
 {
-	char				*new_str;
-	size_t				i;
-	size_t				s1_len;
+	char			*new_str;
+	size_t			i;
+	size_t			s1_len;
 
 	if (!s1 || !c)
 		return (NULL);
@@ -48,11 +53,11 @@ char					*ft_strjoinch(char const *s1, char c)
 	return (new_str);
 }
 
-int						ft_copyuntil(char **dst, char *src, char c)
+int					ft_copyuntil(char **dst, char *src, char c)
 {
-	int					i;
-	int					count;
-	int					pos;
+	int				i;
+	int				count;
+	int				pos;
 
 	i = -1;
 	count = 0;
@@ -71,13 +76,13 @@ int						ft_copyuntil(char **dst, char *src, char c)
 	return (pos);
 }
 
-int						get_next_line(const int fd, char **line)
+int					get_next_line(const int fd, char **line)
 {
-	char				buf[BUFF_SIZE + 1];
-	static t_list		*file;
-	int					i;
-	int					ret;
-	t_list				*curr;
+	char			buf[BUFF_SIZE + 1];
+	static t_list	*file;
+	int				i;
+	int				ret;
+	t_list			*curr;
 
 	if ((fd < 0 || line == NULL || read(fd, buf, 0) < 0))
 		return (-1);
